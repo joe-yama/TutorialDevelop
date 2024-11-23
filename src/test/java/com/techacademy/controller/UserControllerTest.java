@@ -6,11 +6,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.asm.TypeReference;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -19,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techacademy.entity.User;
 
 @SpringBootTest
@@ -64,12 +69,21 @@ class UserControllerTest {
   @DisplayName("User一覧画面")
   @WithMockUser
   void testGetList() throws Exception {
+    Map<Integer, String> expected = new HashMap<>();
+    expected.put(1, "キラメキ太郎");
+    expected.put(2, "キラメキ次郎");
+    expected.put(3, "キラメキ花子");
+
     MvcResult result = mockMvc.perform(get("/user/list")) // URLにアクセス
         .andExpect(status().isOk()) // ステータスを確認
         .andExpect(model().attributeExists("userlist")) // Modelの内容を確認
         .andExpect(model().hasNoErrors()) // Modelのエラー有無の確認
         .andExpect(view().name("user/list")) // viewの確認
         .andReturn(); // 内容の取得
-    // TODO: add testcode
+    ArrayList<User> users = (ArrayList<User>) result.getModelAndView().getModel().get("userlist");
+    assertEquals(3, users.size());
+    for (User user : users) {
+      assertEquals(expected.get(user.getId()), user.getName());
+    }
   }
 }
