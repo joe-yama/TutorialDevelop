@@ -47,7 +47,7 @@ public class UserController {
   public String postRegister(@Validated User user, BindingResult res, Model model) {
     if (res.hasErrors()) {
       // エラーあり
-      return getRegister(user);
+      return "user/register";
     }
     // User登録
     service.saveUser(user);
