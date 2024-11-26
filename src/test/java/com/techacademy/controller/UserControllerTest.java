@@ -80,7 +80,13 @@ class UserControllerTest {
         .andExpect(model().hasNoErrors()) // Modelのエラー有無の確認
         .andExpect(view().name("user/list")) // viewの確認
         .andReturn(); // 内容の取得
-    ArrayList<User> users = (ArrayList<User>) result.getModelAndView().getModel().get("userlist");
+    ArrayList<?> resultList = (ArrayList<?>) result.getModelAndView().getModel().get("userlist");
+    ArrayList<User> users = new ArrayList<User>();
+    for (Object object : resultList) {
+      if (object instanceof User) {
+        users.add((User) object);
+      }
+    }
     assertEquals(3, users.size());
     for (User user : users) {
       assertEquals(expected.get(user.getId()), user.getName());
